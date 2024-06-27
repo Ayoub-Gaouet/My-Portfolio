@@ -5,16 +5,17 @@ import corpcommentImg from "@/public/corpcomment.png";
 import rmtdevImg from "@/public/rmtdev.png";
 import wordanalyticsImg from "@/public/wordanalytics.png";
 import EcommerceApp from "@/public/EcommerceApp.png";
+import pet from "@/public/pet.png";
 
 export const links = [
   {
     name: "Accueil",
     hash: "#accueil",
   },
-  {
-    name: "À propos",
-    hash: "#apropos",
-  },
+  // {
+  //   name: "À propos",
+  //   hash: "#apropos",
+  // },
   {
     name: "Projets",
     hash: "#projets",
@@ -82,5 +83,11 @@ export const projectsData = [
     description: "J'ai travaillé en tant que développeur mobile sur ce projet de startup pendant 3 mois. Les utilisateurs peuvent acheter des articles en ligne a partir cette application.",
     tags: ["PhpStorm", "Wamp", "Laravel 8", "PHP 8", "MariaDB", "Bitbucket", "Firebase", "REST", "Postman", "Flutter", "Dart", "State Management GetX", "IntelliJ IDEA", "Plesk"],
     imageUrl: EcommerceApp,
+  },
+  {
+    "title": "Application web de gestion des gardes d’animaux de compagnie",
+    "description": "Création d'une application web pour automatiser la gestion des gardes d'animaux. Elle permet aux utilisateurs de gérer efficacement les réservations et suivis.",
+    "tags": ["PHP", "Laravel", "jQuery", "MySQL", "PhpStorm", "Bootstrap", "HTML5", "WAMP", "CSS"],
+    imageUrl: pet,
   }
 ] as const;

@@ -19,7 +19,7 @@ export default function Intro() {
             className="flex flex-col-reverse sm:flex-row items-center justify-between mb-28 max-w-7xl mx-auto sm:mb-0 scroll-mt-[100rem]"
         >
             <motion.div
-                className="w-full sm:w-1/2 px-4 text-left"
+                className="w-full sm:w-1/1.5 px-4 text-left"
                 initial={{ opacity: 0, y: 100 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -29,27 +29,28 @@ export default function Intro() {
                     initial={{ opacity: 0, y: 100 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    <strong>Bonjour</strong>, je suis <strong> Ayoub Gaouet </strong> Innovateur en {' '}
-                    <strong>développement Web et Mobile</strong> animé par la <strong>créativité et la technologie</strong>.
-                    Découvrez mon univers où le design et le code se rencontrent pour créer des expériences numériques exceptionnelles
+                    <strong>Bonjour</strong>, je suis <strong>Ayoub Gaouet</strong>, développeur web et mobile qualifiée, spécialisée en <strong>design UI/UX</strong>.
+                    Avec une solide expérience en <strong>PHP, Laravel et Flutter</strong>, je suis passionnée par la création de solutions numériques innovantes.
+                    J'aspire à transformer les idées en réalités numériques.
                 </motion.h1>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                        <a href="#contact"
-                            className="bg-gray-900 text-white px-7 py-3 flex items-center gap-2 rounded-full transition ease-in-out duration-150 hover:scale-105 hover:bg-gray-700"
-                            onClick={() => {
-                                setActiveSection('Contact');
-                                setTimeOfLastClick(Date.now());
-                            }}
-                        >
-                            Contact me here <BsArrowRight className="ml-2" />
-                        </a>
+                    <a
+                        href="#contact"
+                        className="bg-gray-900 text-white px-7 py-3 flex items-center gap-2 rounded-full transition ease-in-out duration-150 hover:scale-105 hover:bg-gray-700"
+                        onClick={() => {
+                            setActiveSection('Contact');
+                            setTimeOfLastClick(Date.now());
+                        }}
+                    >
+                        Contactez-moi ici <BsArrowRight className="ml-2" />
+                    </a>
 
                     <a
                         className="bg-white text-gray-900 px-7 py-3 flex items-center gap-2 rounded-full border border-gray-300 transition ease-in-out duration-150 hover:scale-105"
                         href="/Ayoub Gaouet CV.pdf"
                         download
                     >
-                        Download CV <HiDownload className="ml-2" />
+                        Télécharger CV <HiDownload className="ml-2" />
                     </a>
                 </div>
                 {/* Social Icons */}
@@ -78,14 +79,14 @@ export default function Intro() {
                     className="relative inline-block"
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ type: 'tween', duration: 0.2 }}>
+                    transition={{ type: 'tween', duration: 0.2 }}
+                >
                     <Image
                         src="/profile-photo.jpg"
-                        alt="Ricardo portrait"
-                        width="300"
-                        height="300"
-                        priority={true}
-                        className="rounded-full object-cover border-4 border-white shadow-xl"
+                        alt="Ayoub Gaouet"
+                        width={300}
+                        height={300}
+                        className="rounded-full"
                     />
                 </motion.div>
             </div>
