@@ -3,11 +3,13 @@
 import { z } from "zod"
 import nodemailer from "nodemailer"
 
+// Updated schema to include recaptchaToken
 const contactFormSchema = z.object({
     name: z.string().min(2),
     email: z.string().email(),
     subject: z.string().min(5),
     message: z.string().min(10),
+    recaptchaToken: z.string().min(1, "reCAPTCHA verification is required"),
 })
 
 type ContactFormData = z.infer<typeof contactFormSchema>
@@ -20,11 +22,49 @@ const transporter = nodemailer.createTransport({
     },
 })
 
+// Function to verify reCAPTCHA token
+async function verifyRecaptcha(token: string) {
+    try {
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY
+
+        if (!secretKey) {
+            console.error("reCAPTCHA secret key is not defined")
+            return { success: false }
+        }
+
+        const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                secret: secretKey,
+                response: token
+            }).toString()
+        })
+
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.error("reCAPTCHA verification error:", error)
+        return { success: false }
+    }
+}
 
 export async function submitContactForm(formData: ContactFormData) {
     try {
-        // Valider les données du formulaire
+        // Validate form data
         const validatedData = contactFormSchema.parse(formData)
+
+        // Verify reCAPTCHA token
+        const recaptchaResponse = await verifyRecaptcha(validatedData.recaptchaToken)
+
+        if (!recaptchaResponse.success) {
+            return {
+                success: false,
+                message: "La vérification reCAPTCHA a échoué. Veuillez réessayer.",
+            }
+        }
 
         // Construire le contenu de l'email
         const mailOptions = {
@@ -55,7 +95,6 @@ export async function submitContactForm(formData: ContactFormData) {
         </div>
     `,
         }
-
 
         // Envoyer l'email
         await transporter.sendMail(mailOptions)

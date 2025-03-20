@@ -1,21 +1,21 @@
+
 "use client"
 
-import type React from "react"
+import { useState, useRef } from "react"
+import { Button } from "@/components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import ReCAPTCHA from "react-google-recaptcha"
 
-import {useState} from "react"
-import {Button} from "@/components/ui/button"
-import {zodResolver} from "@hookform/resolvers/zod"
-import {useForm} from "react-hook-form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { toast } from "sonner"
+import { submitContactForm } from "@/lib/actions"
 
-import {Input} from "@/components/ui/input"
-import {Textarea} from "@/components/ui/textarea"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form"
-import {toast} from "sonner"
-import {submitContactForm} from "@/lib/actions"
-
-import {Github, Linkedin, Mail, MapPin, Phone} from "lucide-react"
-import {z} from "zod"
+import { Github, Linkedin, Mail, MapPin, Phone } from "lucide-react"
+import { z } from "zod"
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -24,11 +24,14 @@ const formSchema = z.object({
     email: z.string().email({
         message: "Please enter a valid email address.",
     }),
-    subject: z.string().min(2, {
-        message: "Subject must be at least 2 characters.",
+    subject: z.string().min(5, {
+        message: "Subject must be at least 5 characters.",
     }),
     message: z.string().min(10, {
         message: "Message must be at least 10 characters.",
+    }),
+    recaptchaToken: z.string().min(1, {
+        message: "Please verify you are not a robot.",
     }),
 })
 
@@ -36,6 +39,7 @@ type FormValues = z.infer<typeof formSchema>
 
 export default function Contact() {
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const recaptchaRef = useRef<ReCAPTCHA>(null)
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -44,8 +48,18 @@ export default function Contact() {
             email: "",
             subject: "",
             message: "",
+            recaptchaToken: "",
         },
     })
+
+    // Handle reCAPTCHA change
+    const handleRecaptchaChange = (token: string | null) => {
+        form.setValue("recaptchaToken", token || "")
+        // Clear error if token is valid
+        if (token) {
+            form.clearErrors("recaptchaToken")
+        }
+    }
 
     // Handle form submission
     async function onSubmit(values: FormValues) {
@@ -57,13 +71,15 @@ export default function Contact() {
 
             if (result.success) {
                 // Show success toast notification
-                toast.success("Message sent successfully! We'll get back to you soon.", {
+                toast.success(result.message || "Message sent successfully! We'll get back to you soon.", {
                     duration: 5000,
                     position: "top-center",
                 })
 
                 // Reset the form after successful submission
                 form.reset()
+                // Reset reCAPTCHA
+                recaptchaRef.current?.reset()
             } else {
                 // Show error toast notification with the specific error message
                 toast.error(result.message || "Something went wrong. Please try again.", {
@@ -103,59 +119,75 @@ export default function Contact() {
                         </CardHeader>
                         <CardContent>
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)}  className="space-y-4">
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                                     <FormField
                                         control={form.control}
                                         name="name"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Name</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Your name" {...field} />
                                                 </FormControl>
-                                                <FormMessage/>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                     <FormField
                                         control={form.control}
                                         name="email"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Email</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="your.email@example.com" {...field} />
                                                 </FormControl>
-                                                <FormDescription>Well never share your email with anyone
-                                                    else.</FormDescription>
-                                                <FormMessage/>
+                                                <FormDescription>Well never share your email with anyone else.</FormDescription>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                     <FormField
                                         control={form.control}
                                         name="subject"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Subject</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Subject" {...field} />
                                                 </FormControl>
-                                                <FormMessage/>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                     <FormField
                                         control={form.control}
                                         name="message"
-                                        render={({field}) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Message</FormLabel>
                                                 <FormControl>
-                                                    <Textarea placeholder="How can we help you?"
-                                                              className="min-h-[120px]" {...field} />
+                                                    <Textarea placeholder="How can we help you?" className="min-h-[120px]" {...field} />
                                                 </FormControl>
-                                                <FormMessage/>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="recaptchaToken"
+                                        render={() => (
+                                            <FormItem>
+                                                <FormLabel>Verification</FormLabel>
+                                                <FormControl>
+                                                    <ReCAPTCHA
+                                                        ref={recaptchaRef}
+                                                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                                                        onChange={handleRecaptchaChange}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -176,21 +208,21 @@ export default function Contact() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-start gap-4">
-                                <Mail className="h-5 w-5 text-[#6B7CFF] dark:text-[#8A98FF] mt-1"/>
+                                <Mail className="h-5 w-5 text-[#6B7CFF] dark:text-[#8A98FF] mt-1" />
                                 <div>
                                     <h3 className="font-medium">Email</h3>
                                     <p className="text-muted-foreground">contact@ayoubgaouet.com</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">
-                                <Phone className="h-5 w-5 text-[#6B7CFF] dark:text-[#8A98FF] mt-1"/>
+                                <Phone className="h-5 w-5 text-[#6B7CFF] dark:text-[#8A98FF] mt-1" />
                                 <div>
                                     <h3 className="font-medium">Téléphone</h3>
                                     <p className="text-muted-foreground">+216 51 479 343</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">
-                                <MapPin className="h-5 w-5 text-[#6B7CFF] dark:text-[#8A98FF] mt-1"/>
+                                <MapPin className="h-5 w-5 text-[#6B7CFF] dark:text-[#8A98FF] mt-1" />
                                 <div>
                                     <h3 className="font-medium">Localisation</h3>
                                     <p className="text-muted-foreground">El Aouina, Tunis</p>
@@ -200,16 +232,14 @@ export default function Contact() {
                                 <h3 className="font-medium mb-3">Réseaux sociaux</h3>
                                 <div className="flex gap-4">
                                     <Button variant="outline" size="icon" asChild>
-                                        <a href="https://linkedin.com/in/ayoubgaouet" target="_blank"
-                                           rel="noopener noreferrer">
-                                            <Linkedin className="h-5 w-5"/>
+                                        <a href="https://linkedin.com/in/ayoubgaouet" target="_blank" rel="noopener noreferrer">
+                                            <Linkedin className="h-5 w-5" />
                                             <span className="sr-only">LinkedIn</span>
                                         </a>
                                     </Button>
                                     <Button variant="outline" size="icon" asChild>
-                                        <a href="https://github.com/Ayoub-Gaouet" target="_blank"
-                                           rel="noopener noreferrer">
-                                            <Github className="h-5 w-5"/>
+                                        <a href="https://github.com/Ayoub-Gaouet" target="_blank" rel="noopener noreferrer">
+                                            <Github className="h-5 w-5" />
                                             <span className="sr-only">GitHub</span>
                                         </a>
                                     </Button>
