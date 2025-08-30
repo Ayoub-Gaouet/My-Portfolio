@@ -210,7 +210,7 @@ export default function Contact() {
                                 <Mail className="h-5 w-5 text-[#6B7CFF] dark:text-[#8A98FF] mt-1" />
                                 <div>
                                     <h3 className="font-medium">Email</h3>
-                                    <p className="text-muted-foreground">contact@ayoubgaouet.com</p>
+                                    <p className="text-muted-foreground">gaouetayoub1@gmail.com</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">

@@ -16,7 +16,7 @@ export default function Hero() {
                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Mail className="h-5 w-5"/>
-                                <span>contact@ayoubgaouet.com</span>
+                                <span>gaouetayoub1@gmail.com</span>
                             </div>
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Phone className="h-5 w-5"/>
@@ -27,7 +27,7 @@ export default function Hero() {
                             <Button className="rounded-full px-8  bg-[#6B7CFF] dark:bg-[#8A98FF]
                             ">Contact me<ArrowRight className="h-4 w-4"/>
                             </Button>
-                            <Button variant="outline" className="rounded-full border-black border-2 px-8">
+                            <Button variant="outline" className="rounded-full border-black dark:border-white border-2 px-8">
                                 My resume <DownloadCloud className="h-4 w-4"/>
                             </Button>
                         </div>

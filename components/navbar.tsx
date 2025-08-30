@@ -9,9 +9,57 @@ import {ThemeToggle} from "@/components/theme-toggle"
 import {useEffect, useState} from "react"
 import Image from "next/image"
 
+const NAV_ITEMS = [
+    {name: "Bonjour", href: "/"},
+    { name: "Apprenez à me connaître", href: "#learnAboutMe" },
+    {name: "Travaux sélectionnés", href: "#projects"},
+    {name: "Testimonials", href: "#testimonials"},
+    {name: "Contact", href: "#contact"},
+]
+
 export default function Navbar() {
     const pathname = usePathname()
     const [isScrolled, setIsScrolled] = useState(false)
+    const [activeItem, setActiveItem] = useState("/")
+
+    // Use stable NAV_ITEMS constant to avoid recreating array on each render
+    const navItems = NAV_ITEMS
+
+    useEffect(() => {
+        // Initialize activeItem with current pathname
+        if (pathname === "/") {
+            setActiveItem("/")
+        } else {
+            // Check if any anchor in navItems matches the current URL hash
+            const hash = window.location.hash
+            if (hash) {
+                const matchingItem = navItems.find(item => item.href === hash)
+                if (matchingItem) {
+                    setActiveItem(matchingItem.href)
+                    return
+                }
+            }
+            setActiveItem(pathname)
+        }
+    }, [pathname])
+
+    // Listen for hash changes to update active item
+    useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash
+            if (hash) {
+                const matchingItem = navItems.find(item => item.href === hash)
+                if (matchingItem) {
+                    setActiveItem(matchingItem.href)
+                }
+            } else {
+                setActiveItem("/")
+            }
+        }
+
+        window.addEventListener("hashchange", handleHashChange)
+        return () => window.removeEventListener("hashchange", handleHashChange)
+    }, [navItems])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -21,14 +69,6 @@ export default function Navbar() {
         window.addEventListener("scroll", handleScroll)
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
-
-    const navItems = [
-        {name: "Bonjour", href: "/"},
-        { name: "A propos de moi", href: "#learnAboutMe" },
-        {name: "Travaux sélectionnés", href: "#projects"},
-        {name: "Testimonials", href: "#testimonials"},
-        {name: "Contact", href: "#contact"},
-    ]
 
     return (
         <header
@@ -42,7 +82,9 @@ export default function Navbar() {
                     <Link href="/" className="flex items-center space-x-2">
                         <div
                             className="h-8 w-8 rounded-full flex items-center justify-center text-primary-foreground font-bold">
-                            <Image src="/Logo.svg" alt="Logo" width={32} height={32}/>
+                            {/* Two Image components toggled by Tailwind's dark class to match footer behavior */}
+                            <Image src="/Logo.svg" alt="Logo" width={32} height={32} className="block dark:hidden" />
+                            <Image src="/Logo-white.svg" alt="Logo" width={32} height={32} className="hidden dark:block" />
                         </div>
                     </Link>
                     <nav className="hidden md:flex gap-6">
@@ -50,9 +92,10 @@ export default function Navbar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                onClick={() => setActiveItem(item.href)}
                                 className={cn(
                                     "text-sm font-medium transition-colors hover:text-primary",
-                                    pathname === item.href ? "text-foreground" : "text-muted-foreground",
+                                    activeItem === item.href ? "text-black dark:text-white font-semibold" : "text-muted-foreground",
                                 )}
                             >
                                 {item.name}
@@ -79,4 +122,3 @@ export default function Navbar() {
         </header>
     )
 }
-
