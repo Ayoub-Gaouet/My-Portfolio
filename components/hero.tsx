@@ -27,8 +27,10 @@ export default function Hero() {
                             <Button className="rounded-full px-8  bg-[#6B7CFF] dark:bg-[#8A98FF]
                             ">Contact me<ArrowRight className="h-4 w-4"/>
                             </Button>
-                            <Button variant="outline" className="rounded-full border-black dark:border-white border-2 px-8">
-                                My resume <DownloadCloud className="h-4 w-4"/>
+                            <Button asChild variant="outline" className="rounded-full border-black dark:border-white border-2 px-8">
+                                <a href="/cv.pdf" download>
+                                    My resume <DownloadCloud className="h-4 w-4"/>
+                                </a>
                             </Button>
                         </div>
                     </div>
@@ -43,4 +45,3 @@ export default function Hero() {
         </section>
     )
 }
-
